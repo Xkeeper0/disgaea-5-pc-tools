@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 
 	chdir(argv[1]);	// chdir to the input folder for simplicity
 	c = argv[1] + strlen(argv[1]) - 4;
-	if (!strncmp(c, ".dec", 4)) // if already a decoded file,
+	if (c >= argv[1] && !strncmp(c, ".dec", 4)) // if already a decoded file,
 		default_mode_char = 'e'; // set default mode to encode
 
 	while (mode_char != 'e' && mode_char != 'd')
@@ -165,14 +165,17 @@ int main(int argc, char *argv[])
 	c_alt = strrchr(argv[1], '/'); // just in case
 	if (c < c_alt) // and take the last one we get
 		c = c_alt;
+
 	if (c == NULL)
 		c = argv[1];
+	else
+		++c;
 
 	memset(default_c, 0, 256);
 	if (default_mode_char == 'e') // if the default was encoding, strip the .dec and call it a day
-		strncpy(default_c, c + 1, strlen(c) - 5);
+		strncpy(default_c, c, strlen(c) - 4);
 	else
-		snprintf(default_c, 255, "%s.%s", c + 1, mode_char == 'd' ? "dec" : "enc");
+		snprintf(default_c, 255, "%s.%s", c, mode_char == 'd' ? "dec" : "enc");
 
 	c = stdin_prompt_string("save as what?", default_c);
 	if (access(c, F_OK) == 0) // confirm if file exists
